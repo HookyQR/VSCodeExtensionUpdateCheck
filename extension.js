@@ -25,13 +25,29 @@ const request = {
 	}
 };
 
+/*
+publisher:Object
+	publisherId:"52bd646e-05dd-438c-9d2c-3dee92b32057"
+	publisherName:"crisward"
+	displayName:"crisward"
+	flags:"none"
+extensionId:"315bcbeb-4f7b-48eb-ab58-f8be776bed61"
+extensionName:"riot-tag"
+displayName:"Riot-Tag"
+flags:"validated, public"
+lastUpdated:"2016-02-26T18:33:35.437Z"
+publishedDate:"2016-02-16T22:22:13.44Z"
+shortDescription:"Riot Tag Syntax Highlighting for Riot.js HTML,JADE and Coffeescript"
+*/
 function activate(context) {
 	//find the ones in the same location as this one.
-	let base = path.dirname(context.extensionPath);
+	//let base = path.dirname(context.extensionPath);
+	let base = "/Users/hooky/.vscode/extensions";
 	let updatable = vscode.extensions.all.filter(ext => path.dirname(ext.extensionPath) === base);
-	let hasVersions = ext => ext.versions && ext.versions.length > 1;
-	let embedLocal = ext => updatable.some(inst => ext.extensionName === inst.packageJSON.name ? (ext._installed = inst.packageJSON) :
-		false);
+	let hasVersions = ext => (ext.versions && ext.versions.length > 1);
+	let embedLocal = ext => updatable.some(inst =>
+		(ext.extensionName === inst.packageJSON.name && ext.publisher.displayName === inst.packageJSON.publisher &&
+			(ext._installed = inst.packageJSON)));
 	let checkOnDate = ext => !ext._installed.__metadata || ext._installed.__metadata.date < ext.versions[0].lastUpdated;
 	let checkVersion = function(ext) {
 		if (ext._installed.__metadata) return true; //was done on date
@@ -54,7 +70,8 @@ function activate(context) {
 	let status = vscode.window.createStatusBarItem();
 	status.text = "$(cloud-download) $(sync)";
 	status.show();
-	context.subscriptions.push(status);
+	context.subscriptions
+		.push(status);
 	let statusFail = function(e) {
 		console.log(e);
 		status.text = "$(cloud-download) Fail";
